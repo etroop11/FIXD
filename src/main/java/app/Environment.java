@@ -14,6 +14,10 @@ public class Environment extends Application{
 		mainStage.show();
 	}
 
+	public static void main(String[] args) {
+		System.out.println("HELLO");
+		launch(args);
+	}
 
 
 }
