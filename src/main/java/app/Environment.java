@@ -12,6 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.ListView;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 //Unirest Imports
 import kong.unirest.Unirest;
@@ -24,22 +25,42 @@ public class Environment extends Application{
 	private ArrayList<String> currencies = new ArrayList();
 
 	public void start(Stage mainStage){
+
+		//shoudl read from file to store Default data
 		BorderPane mainPane = new BorderPane();
 
 		HBox topPane = new HBox();
+		
+
 		VBox sidePane = new VBox();
 
 		if(setData()){
-		 	currencies = getKeys();
-			System.out.println(currencies);
+		 	this.currencies = getKeys();
+			
 		} else {
 			//Defaiult to no connection/Error screen
 		}
 
+
+		mainPane.setLeft(genLeftPanel());
 		
 		Scene s = new Scene(mainPane);
 		mainStage.setScene(s);
 		mainStage.show();
+	}
+
+	private HBox genTopPanel(){
+
+		return null;
+	}
+
+	private VBox genLeftPanel(){
+		VBox sidePane =  new VBox();
+		
+		ObservableList<String> obsList = FXCollections.observableList(this.currencies);
+		sidePane.getChildren().add(new ListView(obsList));
+
+		return sidePane;
 	}
 
 	public ArrayList<String> getKeys(){//should throw an exception rather than handle natively, use this for now
