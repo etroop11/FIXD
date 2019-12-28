@@ -27,11 +27,18 @@ import kong.unirest.HttpResponse;
 import kong.unirest.json.JSONObject;
 
 public class Environment extends Application{
+	public static final String SERVER_URL = "https://api.exchangeratesapi.io";
 	public static String BASE = "USD";
+	public static String START_DATE = "2000-01-01";
+	private static Calendar currentDate;
+
 	private JSONObject data;
 	private ArrayList<String> currencies = new ArrayList();
-	private Calendar currentDate;
+
 	private Calendar selectedDate;
+	private InfoDisplay[] infoDisplays;
+	private InfoDisplay currentDisplay;
+
 	public void start(Stage mainStage){
 		//Defaults init
 		dataInitHelper();
@@ -42,18 +49,31 @@ public class Environment extends Application{
 		
 		mainPane.setLeft(genLeftPanel());
 		mainPane.setTop(genTopPanel());
-		
+		mainPane.setCenter(this.currentDisplay.getDisplay());
 		Scene s = new Scene(mainPane);
 		mainStage.setScene(s);
 		mainStage.show();
 	}
 
+	//shoudl check bound and stuff
 	private void dataInitHelper(){
-		this.currentDate = Calendar.getInstance();
+		currentDate = Calendar.getInstance();
 		this.selectedDate = currentDate;
 		
 		setData();
+
 		this.currencies = getKeys("rates");
+		this.infoDisplays = new InfoDisplay[this.currencies.size()];
+		for(int i = 0; i < this.infoDisplays.length; i ++){
+			String key = this.currencies.get(i);
+			Double val = this.data.getJSONObject("rates").getDouble(key);
+			//System.out.println("Key : " + key + " | val : " + val);
+			this.infoDisplays[i] = new InfoDisplay(key, val);
+		}
+
+		this.currentDisplay = this.infoDisplays[0];
+
+
 	}
 
 	private HBox genTopPanel(){
@@ -66,11 +86,11 @@ public class Environment extends Application{
 		currentCurrencyBox.setItems(FXCollections.observableList(this.currencies));
 		currentCurrencyBox.setValue(currentCurrencyBox.getItems().get(currentCurrencyBox.getItems().indexOf(Environment.BASE)));
 
-		Label dateLabel = new Label("   At Date : Day : ");
-		TextField dayField = new TextField("" + selectedDate.get(Calendar.DAY_OF_MONTH));
-
-		Label monthLabel = new Label(" Month : ");
+		Label dateLabel = new Label("   At Date : Month : ");
 		TextField monthField = new TextField("" + (selectedDate.get(Calendar.MONTH) + 1));
+		
+		Label dayLabel = new Label(" Day : ");
+		TextField dayField = new TextField("" + selectedDate.get(Calendar.DAY_OF_MONTH));
 
 		Label yearLabel = new Label(" Year : ");
 		TextField yearField = new TextField("" + selectedDate.get(Calendar.YEAR));
@@ -80,9 +100,9 @@ public class Environment extends Application{
 		hb.getChildren().add(fromLabel);
 		hb.getChildren().add(currentCurrencyBox);
 		hb.getChildren().add(dateLabel);
-		hb.getChildren().add(dayField);
-		hb.getChildren().add(monthLabel);
 		hb.getChildren().add(monthField);
+		hb.getChildren().add(dayLabel);
+		hb.getChildren().add(dayField);
 		hb.getChildren().add(yearLabel);
 		hb.getChildren().add(yearField);
 		hb.getChildren().add(goButton);
@@ -98,7 +118,7 @@ public class Environment extends Application{
 		return sidePane;
 	}
 
-	public ArrayList<String> getKeys(String forKey){//should throw an exception rather than handle natively, use this for now
+	public ArrayList<String> getKeys(String forKey){
 		if(this.data != null){
 			ArrayList<String> strs = new ArrayList();
 			Iterator i = data.getJSONObject(forKey).keys();
@@ -111,13 +131,25 @@ public class Environment extends Application{
 	}
 
 	public void setData(){
-		
-			HttpResponse<String> response = Unirest.get("https://api.exchangeratesapi.io/latest")
+			HttpResponse<String> response = Unirest.get(SERVER_URL + "/latest")
 													.queryString("base", Environment.BASE)
 													.asString();
 			String text = response.getBody();
 			this.data = new JSONObject(text);
-		
+	}
+
+	private void createInfoDisplays(){
+		this.infoDisplays = new InfoDisplay[this.currencies.size()];
+
+		for(int i = 0; i < this.currencies.size(); i ++){
+
+
+
+		}
+	}
+
+	public static Calendar getCurrentDate(){
+		return currentDate;
 	}
 
 	public static void main(String[] args) {
