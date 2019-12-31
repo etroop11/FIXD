@@ -31,18 +31,20 @@ public class InfoDisplay{
 	private double valueFromBase;
 	private boolean dataInitilized = false;
 	private JSONObject data;
+	private ObservableList<DataPoint> currentRelativeValues;
 	private ObservableList<DataPoint> pastData;
 
 	public InfoDisplay(String currency, Double valueFromBase){
 		this.currency = currency;
 		this.valueFromBase = valueFromBase;
+		this.currentRelativeValues = FXCollections.observableArrayList();
 		this.pastData = FXCollections.observableArrayList();
 	}
 
 	//wrapper class for historical data point
 	public class DataPoint{
-		public final SimpleStringProperty key;
-		public final SimpleDoubleProperty value;
+		private final SimpleStringProperty key;
+		private final SimpleDoubleProperty value;
 
 		public DataPoint(String k, Double v){
 			this.key = new SimpleStringProperty(k);
@@ -67,6 +69,14 @@ public class InfoDisplay{
 												.queryString("base", this.currency).asString();
 		this.data = new JSONObject(response.getBody());
 
+		Iterator currencies = data.getJSONObject("rates").keys();
+		while(currencies.hasNext()){
+			String c = (String)currencies.next();
+			Double v = data.getJSONObject("rates").getDouble(c);
+			this.currentRelativeValues.add(new DataPoint(c, v));
+		}
+
+
 		Calendar now = Environment.getCurrentDate();
 		int yearNow = now.get(Calendar.YEAR);
 		int monthNow = now.get(Calendar.MONTH) + 1;
@@ -75,6 +85,11 @@ public class InfoDisplay{
 		String keyString = yearNow + "-" + monthNow + "-" + dayNow;
 
 //DO ERROR HANDLING
+		System.out.println(keyString);
+		System.out.println(this.currency);
+		System.out.println(this.currency.length());
+		System.out.println(Environment.BASE);
+
 		HttpResponse<String> historicalDataResponse = Unirest.get(Environment.SERVER_URL + "/history")
 															.queryString("start_at", Environment.START_DATE)
 															.queryString("end_at", keyString)
@@ -83,7 +98,7 @@ public class InfoDisplay{
 															.asString();
 
 		JSONObject history = new JSONObject(historicalDataResponse.getBody());
-		
+		System.out.println(history);
 		Iterator keys = history.getJSONObject("rates").keys();
 		ArrayList<String> dates = new ArrayList();
 		while(keys.hasNext()){
@@ -123,15 +138,35 @@ public class InfoDisplay{
 		topPanel.getChildren().add(leftTop);
 		topPanel.getChildren().add(rightTop);
 
-
+		
 
 		VBox midPanel = new VBox();
 		midPanel.setAlignment(Pos.CENTER);
 
-		Label tableTitle = new Label("Value History");
+		TableView relativeTable = new TableView();
+		relativeTable.setEditable(false);
 
-		TableView table = new TableView();
-		table.setEditable(false);
+		TableColumn<DataPoint, String> currencyCol = new TableColumn("Currency");
+		currencyCol.setCellValueFactory(new PropertyValueFactory<DataPoint, String>("key"));
+
+		TableColumn<DataPoint, Double> relValCol = new TableColumn("Value in " + this.currency);
+		relValCol.setCellValueFactory(new PropertyValueFactory<DataPoint, Double>("value"));
+
+		relativeTable.getColumns().add(currencyCol);
+		relativeTable.getColumns().add(relValCol);
+		relativeTable.setItems(this.currentRelativeValues);
+
+		midPanel.getChildren().add(relativeTable);
+
+
+
+		VBox bottomPanel = new VBox();
+		bottomPanel.setAlignment(Pos.CENTER);
+
+		Label historyTableTitle = new Label("Value History");
+
+		TableView historyTable = new TableView();
+		historyTable.setEditable(false);
 
 		TableColumn<DataPoint,String> dateCol = new TableColumn("Date");
 		dateCol.setCellValueFactory(new PropertyValueFactory<DataPoint, String>("key"));
@@ -139,17 +174,18 @@ public class InfoDisplay{
 		TableColumn<DataPoint, Double> valCol = new TableColumn("Value in " + Environment.BASE);
 		valCol.setCellValueFactory(new PropertyValueFactory<DataPoint, Double>("value"));
 
-		table.getColumns().add(dateCol);
-		table.getColumns().add(valCol);
-		table.setItems(this.pastData);
+		historyTable.getColumns().add(dateCol);
+		historyTable.getColumns().add(valCol);
+		historyTable.setItems(this.pastData);
 
-		midPanel.getChildren().add(tableTitle);
-		midPanel.getChildren().add(table);
+		bottomPanel.getChildren().add(historyTableTitle);
+		bottomPanel.getChildren().add(historyTable);
 
 
 
 		mainTemp.getChildren().add(topPanel);
 		mainTemp.getChildren().add(midPanel);
+		mainTemp.getChildren().add(bottomPanel);
 
 		return mainTemp;
 

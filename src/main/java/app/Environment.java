@@ -28,7 +28,7 @@ import kong.unirest.json.JSONObject;
 
 public class Environment extends Application{
 	public static final String SERVER_URL = "https://api.exchangeratesapi.io";
-	public static String BASE = "USD";
+	public static String BASE = "CAD";
 	public static String START_DATE = "2000-01-01";
 	private static Calendar currentDate;
 
@@ -38,12 +38,13 @@ public class Environment extends Application{
 	private Calendar selectedDate;
 	private InfoDisplay[] infoDisplays;
 	private InfoDisplay currentDisplay;
+	private BorderPane mainPane;
 
 	public void start(Stage mainStage){
 		//Defaults init
 		dataInitHelper();
 
-		BorderPane mainPane = new BorderPane();
+		this.mainPane = new BorderPane();
 
 		HBox topPane = new HBox();
 		
@@ -68,7 +69,7 @@ public class Environment extends Application{
 
 		this.currentDisplay = this.infoDisplays[0];
 
-		System.out.println("DataInit Finished");
+		//System.out.println("DataInit Finished");
 	}
 
 	private HBox genTopPanel(){
@@ -108,7 +109,21 @@ public class Environment extends Application{
 		VBox sidePane =  new VBox();
 		
 		ObservableList<String> obsList = FXCollections.observableList(this.currencies);
-		sidePane.getChildren().add(new ListView(obsList));
+		ListView view = new ListView(obsList);
+		view.getSelectionModel().selectedItemProperty().addListener(
+			(obs, oldVal, newVal) -> {
+				for(InfoDisplay inf : this.infoDisplays){
+					System.out.println(oldVal);
+					System.out.println(newVal);
+					if(inf.currency.equals(newVal)){
+						System.out.println(inf.currency);
+						this.currentDisplay = inf;
+						this.mainPane.setCenter(currentDisplay.getDisplay());
+						break;
+					}
+				}
+			});
+		sidePane.getChildren().add(view);
 
 		return sidePane;
 	}
