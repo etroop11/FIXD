@@ -1,3 +1,5 @@
+app/InfoDisplay$DataPoint.class
+app/InfoDisplay.class
 app/Environment.class
 app/Helper.class
-app/InfoDisplay.class
+app/DataPoint.class

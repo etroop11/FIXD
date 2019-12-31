@@ -12,7 +12,14 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.geometry.Pos;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.collections.ObservableList;
+import javafx.collections.FXCollections;
 
 //Unirest Imports
 import kong.unirest.Unirest;
@@ -24,16 +31,38 @@ public class InfoDisplay{
 	private double valueFromBase;
 	private boolean dataInitilized = false;
 	private JSONObject data;
-	private HashMap<String, Double> pastData;
+	private ObservableList<DataPoint> pastData;
 
 	public InfoDisplay(String currency, Double valueFromBase){
 		this.currency = currency;
 		this.valueFromBase = valueFromBase;
-		this.pastData = new HashMap();
+		this.pastData = FXCollections.observableArrayList();
+	}
+
+	//wrapper class for historical data point
+	public class DataPoint{
+		public final SimpleStringProperty key;
+		public final SimpleDoubleProperty value;
+
+		public DataPoint(String k, Double v){
+			this.key = new SimpleStringProperty(k);
+			this.value = new SimpleDoubleProperty(v);
+		}
+
+		public String getKey(){
+			return this.key.get();
+		}
+
+		public Double getValue(){
+			return this.value.get();
+		}
+
+
 	}
 
 	private void setData(){
 		//Iniitilize Data with this currency as base
+//DO ERROR HANDLING
 		HttpResponse<String> response = Unirest.get(Environment.SERVER_URL + "/latest")
 												.queryString("base", this.currency).asString();
 		this.data = new JSONObject(response.getBody());
@@ -45,6 +74,7 @@ public class InfoDisplay{
 	
 		String keyString = yearNow + "-" + monthNow + "-" + dayNow;
 
+//DO ERROR HANDLING
 		HttpResponse<String> historicalDataResponse = Unirest.get(Environment.SERVER_URL + "/history")
 															.queryString("start_at", Environment.START_DATE)
 															.queryString("end_at", keyString)
@@ -65,10 +95,11 @@ public class InfoDisplay{
 		for(int i = 0; i < dates.size(); i ++){
 			Double v =  history.getJSONObject("rates").getJSONObject(dates.get(i)).getDouble(currency);
 			//System.out.println(dates.get(i) + " : " +  v);
-			pastData.put(dates.get(i), v);
+			DataPoint dp = new DataPoint(dates.get(i), v);
+			this.pastData.add(dp);
 		}
 
-		
+
 
 		this.dataInitilized = true;
 	}
@@ -92,7 +123,33 @@ public class InfoDisplay{
 		topPanel.getChildren().add(leftTop);
 		topPanel.getChildren().add(rightTop);
 
+
+
+		VBox midPanel = new VBox();
+		midPanel.setAlignment(Pos.CENTER);
+
+		Label tableTitle = new Label("Value History");
+
+		TableView table = new TableView();
+		table.setEditable(false);
+
+		TableColumn<DataPoint,String> dateCol = new TableColumn("Date");
+		dateCol.setCellValueFactory(new PropertyValueFactory<DataPoint, String>("key"));
+
+		TableColumn<DataPoint, Double> valCol = new TableColumn("Value in " + Environment.BASE);
+		valCol.setCellValueFactory(new PropertyValueFactory<DataPoint, Double>("value"));
+
+		table.getColumns().add(dateCol);
+		table.getColumns().add(valCol);
+		table.setItems(this.pastData);
+
+		midPanel.getChildren().add(tableTitle);
+		midPanel.getChildren().add(table);
+
+
+
 		mainTemp.getChildren().add(topPanel);
+		mainTemp.getChildren().add(midPanel);
 
 		return mainTemp;
 
