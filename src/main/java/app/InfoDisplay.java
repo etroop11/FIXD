@@ -2,6 +2,10 @@ package app;
 
 //Java Util Imports
 import java.util.Calendar;
+import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 
 //JavaFX imports
 import javafx.scene.layout.Pane;
@@ -20,10 +24,12 @@ public class InfoDisplay{
 	private double valueFromBase;
 	private boolean dataInitilized = false;
 	private JSONObject data;
+	private HashMap<String, Double> pastData;
 
 	public InfoDisplay(String currency, Double valueFromBase){
 		this.currency = currency;
 		this.valueFromBase = valueFromBase;
+		this.pastData = new HashMap();
 	}
 
 	private void setData(){
@@ -38,15 +44,31 @@ public class InfoDisplay{
 		int dayNow = now.get(Calendar.DAY_OF_MONTH);
 	
 		String keyString = yearNow + "-" + monthNow + "-" + dayNow;
-		/*
+
 		HttpResponse<String> historicalDataResponse = Unirest.get(Environment.SERVER_URL + "/history")
 															.queryString("start_at", Environment.START_DATE)
 															.queryString("end_at", keyString)
 															.queryString("base", Environment.BASE)
 															.queryString("symbols", this.currency)
 															.asString();
-		System.out.println(historicalDataResponse.getBody());
-		*/
+
+		JSONObject history = new JSONObject(historicalDataResponse.getBody());
+		
+		Iterator keys = history.getJSONObject("rates").keys();
+		ArrayList<String> dates = new ArrayList();
+		while(keys.hasNext()){
+			dates.add((String)keys.next());
+		}
+		Collections.sort(dates);
+
+
+		for(int i = 0; i < dates.size(); i ++){
+			Double v =  history.getJSONObject("rates").getJSONObject(dates.get(i)).getDouble(currency);
+			//System.out.println(dates.get(i) + " : " +  v);
+			pastData.put(dates.get(i), v);
+		}
+
+		
 
 		this.dataInitilized = true;
 	}

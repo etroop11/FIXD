@@ -60,20 +60,15 @@ public class Environment extends Application{
 		currentDate = Calendar.getInstance();
 		this.selectedDate = currentDate;
 		
-		setData();
+		this.setData();
 
 		this.currencies = getKeys("rates");
-		this.infoDisplays = new InfoDisplay[this.currencies.size()];
-		for(int i = 0; i < this.infoDisplays.length; i ++){
-			String key = this.currencies.get(i);
-			Double val = this.data.getJSONObject("rates").getDouble(key);
-			//System.out.println("Key : " + key + " | val : " + val);
-			this.infoDisplays[i] = new InfoDisplay(key, val);
-		}
+		
+		this.createInfoDisplays();
 
 		this.currentDisplay = this.infoDisplays[0];
 
-
+		System.out.println("DataInit Finished");
 	}
 
 	private HBox genTopPanel(){
@@ -118,6 +113,9 @@ public class Environment extends Application{
 		return sidePane;
 	}
 
+
+
+
 	public ArrayList<String> getKeys(String forKey){
 		if(this.data != null){
 			ArrayList<String> strs = new ArrayList();
@@ -140,11 +138,11 @@ public class Environment extends Application{
 
 	private void createInfoDisplays(){
 		this.infoDisplays = new InfoDisplay[this.currencies.size()];
-
-		for(int i = 0; i < this.currencies.size(); i ++){
-
-
-
+		for(int i = 0; i < this.infoDisplays.length; i ++){
+			String key = this.currencies.get(i);
+			Double val = this.data.getJSONObject("rates").getDouble(key);
+			//System.out.println("Key : " + key + " | val : " + val);
+			this.infoDisplays[i] = new InfoDisplay(key, val);
 		}
 	}
 
