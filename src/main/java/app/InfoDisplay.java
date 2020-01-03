@@ -42,13 +42,17 @@ public class InfoDisplay{
 	}
 
 	//wrapper class for historical data point
-	public class DataPoint{
+	public final class DataPoint{
 		private final SimpleStringProperty key;
 		private final SimpleDoubleProperty value;
+		private final String keyString;
+		private final Double valueDouble;
 
 		public DataPoint(String k, Double v){
 			this.key = new SimpleStringProperty(k);
 			this.value = new SimpleDoubleProperty(v);
+			this.keyString = k;
+			this.valueDouble = v;
 		}
 
 		public String getKey(){
@@ -59,23 +63,47 @@ public class InfoDisplay{
 			return this.value.get();
 		}
 
+		public boolean equals(DataPoint other){
+			if(other != null 
+				&& this.keyString != null 
+				&& this.valueDouble != null
+				&& other.keyString != null
+				&& other.valueDouble != null)
+				return this.keyString.equals(other.keyString) && this.valueDouble.equals(other.valueDouble);
+			return false;
+		}
+
 
 	}
 
+	public void changeBaseValue(double newVal){
+		this.valueFromBase = newVal;
+		this.currentRelativeValues = FXCollections.observableArrayList();
+		this.pastData = FXCollections.observableArrayList();
+		this.dataInitilized = false;
+	}
+
 	private void setData(){
+		this.data = new JSONObject();
+		this.currentRelativeValues = FXCollections.observableArrayList();
+		this.pastData = FXCollections.observableArrayList();
 		//Iniitilize Data with this currency as base
-//DO ERROR HANDLING
-		HttpResponse<String> response = Unirest.get(Environment.SERVER_URL + "/latest")
-												.queryString("base", this.currency).asString();
-		this.data = new JSONObject(response.getBody());
-
-		Iterator currencies = data.getJSONObject("rates").keys();
-		while(currencies.hasNext()){
-			String c = (String)currencies.next();
-			Double v = data.getJSONObject("rates").getDouble(c);
-			this.currentRelativeValues.add(new DataPoint(c, v));
+		//DO ERROR HANDLING
+		boolean success = true;
+		String[][] dataArgs = {	{"base"},
+								{this.currency}};
+		this.data = Networking.pull("/latest", dataArgs);
+		if(!data.has("error")){
+			Iterator currencies = data.getJSONObject("rates").keys();
+			while(currencies.hasNext()){
+				String c = (String)currencies.next();
+				Double v = data.getJSONObject("rates").getDouble(c);
+				this.currentRelativeValues.add(new DataPoint(c, v));
+			}
+		} else {
+			this.currentRelativeValues.add(new DataPoint("No Data Available", 0.0));
+			success = false;
 		}
-
 
 		Calendar now = Environment.getCurrentDate();
 		int yearNow = now.get(Calendar.YEAR);
@@ -84,39 +112,36 @@ public class InfoDisplay{
 	
 		String keyString = yearNow + "-" + monthNow + "-" + dayNow;
 
-//DO ERROR HANDLING
-		System.out.println(keyString);
-		System.out.println(this.currency);
-		System.out.println(this.currency.length());
-		System.out.println(Environment.BASE);
 
-		HttpResponse<String> historicalDataResponse = Unirest.get(Environment.SERVER_URL + "/history")
-															.queryString("start_at", Environment.START_DATE)
-															.queryString("end_at", keyString)
-															.queryString("base", Environment.BASE)
-															.queryString("symbols", this.currency)
-															.asString();
+		String[][] historyArgs = {
+						{"start_at", "end_at", "base", "symbols"},
+						{Environment.START_DATE, keyString, Environment.BASE, this.currency}};
+		JSONObject history = Networking.pull("/history", historyArgs);
+		
+		if(!history.has("error")){
+			Iterator keys = history.getJSONObject("rates").keys();
 
-		JSONObject history = new JSONObject(historicalDataResponse.getBody());
-		System.out.println(history);
-		Iterator keys = history.getJSONObject("rates").keys();
-		ArrayList<String> dates = new ArrayList();
-		while(keys.hasNext()){
-			dates.add((String)keys.next());
-		}
-		Collections.sort(dates);
-
-
-		for(int i = 0; i < dates.size(); i ++){
-			Double v =  history.getJSONObject("rates").getJSONObject(dates.get(i)).getDouble(currency);
-			//System.out.println(dates.get(i) + " : " +  v);
-			DataPoint dp = new DataPoint(dates.get(i), v);
+			ArrayList<String> dates = new ArrayList();
+			while(keys.hasNext()){
+				dates.add((String)keys.next());
+			}
+			Collections.sort(dates);
+			
+			for(int i = 0; i < dates.size(); i ++){
+				Double v =  history.getJSONObject("rates").getJSONObject(dates.get(i)).getDouble(currency);
+				//System.out.println(dates.get(i) + " : " +  v);
+				DataPoint dp = new DataPoint(dates.get(i), v);
+				this.pastData.add(dp);
+			}
+		} else {
+			DataPoint dp = new DataPoint("No Data Available", 0.0);
 			this.pastData.add(dp);
+			success = false;
+
 		}
 
-
-
-		this.dataInitilized = true;
+		if(success)
+			this.dataInitilized = true;
 	}
 
 	private VBox generateMainBox(){
@@ -132,7 +157,7 @@ public class InfoDisplay{
 
 		HBox rightTop = new HBox();
 		rightTop.setAlignment(Pos.CENTER_RIGHT);
-		Label valueLabel = new Label("" + this.valueFromBase);
+		Label valueLabel = new Label("" + this.valueFromBase + " " + Environment.BASE);
 		rightTop.getChildren().add(valueLabel);
 
 		topPanel.getChildren().add(leftTop);
@@ -159,28 +184,31 @@ public class InfoDisplay{
 		midPanel.getChildren().add(relativeTable);
 
 
-
 		VBox bottomPanel = new VBox();
 		bottomPanel.setAlignment(Pos.CENTER);
+		if(this.pastData.get(0).equals(new DataPoint("No Data Available", 0.0))){
+			Label noDataLabel = new Label("No Value History Data Available for this Currency");
+			bottomPanel.getChildren().add(noDataLabel);
+		}
+		else if(!this.currency.equals(Environment.BASE)){
+			Label historyTableTitle = new Label("Value History");
 
-		Label historyTableTitle = new Label("Value History");
+			TableView historyTable = new TableView();
+			historyTable.setEditable(false);
 
-		TableView historyTable = new TableView();
-		historyTable.setEditable(false);
+			TableColumn<DataPoint,String> dateCol = new TableColumn("Date");
+			dateCol.setCellValueFactory(new PropertyValueFactory<DataPoint, String>("key"));
 
-		TableColumn<DataPoint,String> dateCol = new TableColumn("Date");
-		dateCol.setCellValueFactory(new PropertyValueFactory<DataPoint, String>("key"));
+			TableColumn<DataPoint, Double> valCol = new TableColumn("Value in " + Environment.BASE);
+			valCol.setCellValueFactory(new PropertyValueFactory<DataPoint, Double>("value"));
 
-		TableColumn<DataPoint, Double> valCol = new TableColumn("Value in " + Environment.BASE);
-		valCol.setCellValueFactory(new PropertyValueFactory<DataPoint, Double>("value"));
+			historyTable.getColumns().add(dateCol);
+			historyTable.getColumns().add(valCol);
+			historyTable.setItems(this.pastData);
 
-		historyTable.getColumns().add(dateCol);
-		historyTable.getColumns().add(valCol);
-		historyTable.setItems(this.pastData);
-
-		bottomPanel.getChildren().add(historyTableTitle);
-		bottomPanel.getChildren().add(historyTable);
-
+			bottomPanel.getChildren().add(historyTableTitle);
+			bottomPanel.getChildren().add(historyTable);
+		}
 
 
 		mainTemp.getChildren().add(topPanel);
@@ -200,3 +228,4 @@ public class InfoDisplay{
 	}
 
 }
+
