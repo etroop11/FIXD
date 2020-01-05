@@ -1,6 +1,7 @@
+app/Environment.class
+app/Style.class
 app/InfoDisplay$DataPoint.class
 app/InfoDisplay.class
 app/ErrorDisplay.class
-app/Environment.class
 app/Helper.class
 app/Networking.class

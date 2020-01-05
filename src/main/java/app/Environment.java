@@ -46,23 +46,27 @@ public class Environment extends Application{
 	private BorderPane mainPane;
 
 	public void start(Stage mainStage){
-		//Defaults init
-			dataInitHelper();
-			this.mainPane = new BorderPane();
-			
-			
+		dataInitHelper();
+		this.mainPane = new BorderPane();
+		
+		this.mainPane.setCenter(this.currentDisplay.getDisplay());
 
-			mainPane.setCenter(this.currentDisplay.getDisplay());
+		if(dataCorrect){
+			this.mainPane.setLeft(genLeftPanel());
+			this.mainPane.setTop(genTopPanel());
+		}
 
-			if(dataCorrect){
-				mainPane.setLeft(genLeftPanel());
-				mainPane.setTop(genTopPanel());
-			}
+		//Style.setDefaultStyle(this.mainPane);
+		System.out.println("CHECK 1");
+		Style.setDefaultStyle(mainPane);
+		Scene s = new Scene(this.mainPane);
+		//Style.setDefaultStyle(s);
 
-			Scene s = new Scene(mainPane);
-			mainStage.setScene(s);
-			mainStage.show();
-	
+
+		
+		Style.setDefaultStyle(mainStage);
+		mainStage.setScene(s);
+		mainStage.show();
 
 	}
 
@@ -88,24 +92,35 @@ public class Environment extends Application{
 
 	private HBox genTopPanel(){
 		HBox hb = new HBox();
+		Style.setTopPaneStyle(hb);
 		hb.setAlignment(Pos.CENTER_RIGHT);
 
 		Label fromLabel = new Label("Base Currency : ");
+		Style.setTopPaneStyle(fromLabel);
 
 		ComboBox currentCurrencyBox = new ComboBox();
 		currentCurrencyBox.setItems(FXCollections.observableList(this.currencies));
 		currentCurrencyBox.setValue(currentCurrencyBox.getItems().get(currentCurrencyBox.getItems().indexOf(Environment.BASE)));
+		Style.setTopPaneStyle(currentCurrencyBox);
 
-		Label dateLabel = new Label("   At Date : Month : ");
+		Label dateLabel = new Label(" At Date : Month :");
 		TextField monthField = new TextField("" + (selectedDate.get(Calendar.MONTH) + 1));
+		Style.setTopPaneStyle(dateLabel);
+		Style.setTopPaneStyle(monthField);
 		
-		Label dayLabel = new Label(" Day : ");
+		Label dayLabel = new Label(" Day :");
 		TextField dayField = new TextField("" + selectedDate.get(Calendar.DAY_OF_MONTH));
+		Style.setTopPaneStyle(dayLabel);
+		Style.setTopPaneStyle(dayField);
 
-		Label yearLabel = new Label(" Year : ");
+		Label yearLabel = new Label(" Year :");
 		TextField yearField = new TextField("" + selectedDate.get(Calendar.YEAR));
+		Style.setTopPaneStyle(yearLabel);
+		Style.setTopPaneStyle(yearField);
+
 
 		Button goButton = new Button("Apply");
+		Style.setTopPaneStyle(goButton);
 		goButton.setOnAction(event -> {
 			//format text
 
@@ -184,6 +199,7 @@ public class Environment extends Application{
 
 				
 		});
+		Style.setDefaultStyle(goButton);
 
 		hb.getChildren().add(fromLabel);
 		hb.getChildren().add(currentCurrencyBox);
@@ -199,19 +215,31 @@ public class Environment extends Application{
 
 	private VBox genLeftPanel(){
 		VBox sidePane =  new VBox();
-		
-		ObservableList<String> obsList = FXCollections.observableList(this.currencies);
+		Style.setDefaultStyle(sidePane);
+
+		ArrayList<Label> labels = new ArrayList();
+		for(String str : this.currencies){
+			Label newLabel = new Label(str);
+			Style.setSidePaneStyle(newLabel);
+			labels.add(newLabel);
+		}
+
+		ObservableList<Label> obsList = FXCollections.observableList(labels);
+
 		ListView view = new ListView(obsList);
+		Style.setDefaultStyle(view);
+
 		view.getSelectionModel().selectedItemProperty().addListener(
 			(obs, oldVal, newVal) -> {
 				for(InfoDisplay inf : this.infoDisplays){
-					if(inf.currency.equals(newVal)){
+					if(inf.currency.equals(((Label)newVal).getText())){
 						this.currentDisplay = inf;
 						this.mainPane.setCenter(currentDisplay.getDisplay());
 						break;
 					}
 				}
 			});
+
 		sidePane.getChildren().add(view);
 
 		return sidePane;

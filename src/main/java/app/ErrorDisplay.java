@@ -14,8 +14,7 @@ public class ErrorDisplay extends InfoDisplay{
 
 	public Pane getDisplay(){
 		VBox vb = new VBox();
-		vb.getChildren().add(new Label("Error Retreiveing Data, Restart to try again"));
-
+		vb.getChildren().add(new Label("Error Retreiveing Data, Restart to try again."));	
 		return vb;
 	}
 

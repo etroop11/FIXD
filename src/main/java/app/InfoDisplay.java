@@ -11,6 +11,7 @@ import java.util.HashMap;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
@@ -146,22 +147,25 @@ public class InfoDisplay{
 
 	private VBox generateMainBox(){
 		VBox mainTemp = new VBox();
+		Style.setMidPaneStyle(mainTemp);
+		
+		BorderPane topPanel = new BorderPane();
 
-		HBox topPanel = new HBox();
-		topPanel.setAlignment(Pos.CENTER);
 
 		HBox leftTop = new HBox();
 		leftTop.setAlignment(Pos.CENTER_LEFT);
+
 		Label currencyLabel = new Label(this.currency);
+		Style.setMidPaneStyle(currencyLabel);
 		leftTop.getChildren().add(currencyLabel);
 
 		HBox rightTop = new HBox();
-		rightTop.setAlignment(Pos.CENTER_RIGHT);
-		Label valueLabel = new Label("" + this.valueFromBase + " " + Environment.BASE);
+		Label valueLabel = new Label("= " + this.valueFromBase + " " + Environment.BASE);
+		Style.setMidPaneStyle(valueLabel);
 		rightTop.getChildren().add(valueLabel);
 
-		topPanel.getChildren().add(leftTop);
-		topPanel.getChildren().add(rightTop);
+		topPanel.setLeft(leftTop);
+		topPanel.setRight(rightTop);
 
 		
 
@@ -169,6 +173,7 @@ public class InfoDisplay{
 		midPanel.setAlignment(Pos.CENTER);
 
 		TableView relativeTable = new TableView();
+		Style.setDefaultStyle(relativeTable);
 		relativeTable.setEditable(false);
 
 		TableColumn<DataPoint, String> currencyCol = new TableColumn("Currency");
@@ -188,12 +193,15 @@ public class InfoDisplay{
 		bottomPanel.setAlignment(Pos.CENTER);
 		if(this.pastData.get(0).equals(new DataPoint("No Data Available", 0.0))){
 			Label noDataLabel = new Label("No Value History Data Available for this Currency");
+			Style.setMidPaneStyle(noDataLabel);
 			bottomPanel.getChildren().add(noDataLabel);
 		}
 		else if(!this.currency.equals(Environment.BASE)){
 			Label historyTableTitle = new Label("Value History");
+			Style.setMidPaneStyle(historyTableTitle);
 
 			TableView historyTable = new TableView();
+			Style.setDefaultStyle(historyTable);
 			historyTable.setEditable(false);
 
 			TableColumn<DataPoint,String> dateCol = new TableColumn("Date");
@@ -205,6 +213,7 @@ public class InfoDisplay{
 			historyTable.getColumns().add(dateCol);
 			historyTable.getColumns().add(valCol);
 			historyTable.setItems(this.pastData);
+
 
 			bottomPanel.getChildren().add(historyTableTitle);
 			bottomPanel.getChildren().add(historyTable);

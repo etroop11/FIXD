@@ -21,7 +21,6 @@ public class Networking{
 				return null;
 			} else if(queries.length == 0){
 				String finalURL = SERVER_URL + append;
-
 				try{
 					JSONObject response = new JSONObject(Unirest.get(finalURL).asString().getBody());
 					if(response.has("error")){
@@ -32,10 +31,12 @@ public class Networking{
 						response.put("error", "Parsing Error (1)");
 						response.put("rates", ratesObj);
 					}
+					System.out.println("finished");
 					return response;
 				} catch (UnirestException ue){
 					JSONObject errorJSON = new JSONObject();
 					errorJSON.put("error", "Error Parsing: " + ue.getMessage());
+					System.out.println("finished");
 					return errorJSON;
 				} catch(Exception e){
 					return null;
@@ -61,11 +62,13 @@ public class Networking{
 						response.put("rates", ratesObj);
 
 					}
+					System.out.println("finished");
 					return response;
 				} catch (UnirestException ue){
 					JSONObject errorJSON = new JSONObject();
 					System.out.println(ue.getMessage());
 					errorJSON.put("error", "Error Parsing (3)");
+					System.out.println("finished");
 					return errorJSON;
 				} catch (Exception e){
 					return null;
@@ -93,7 +96,9 @@ public class Networking{
 	public static boolean connected(){
 		try{
 			URL u = new URL("https://www.google.com");
+			System.out.println("trying to connect");
 			u.openConnection().connect();
+			System.out.println("connected");
 		} catch(Exception e){
 			System.out.println(e);
 			return false;
