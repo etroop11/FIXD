@@ -28,12 +28,11 @@ import javafx.geometry.Pos;
 
 
 public class Style{
+
+	//Colors used in the Pane
 	public static final Color FONT_COLOR = Color.web("0x213348"),
 	COLOR1 = Color.web("0x0085C2"), 
-	COLOR2 = Color.web("0xDE8A8D"),
-	COLOR3 = Color.web("0xB1DCF5"),
-	COLOR4 = Color.web("0x815AD5"),
-	COLOR5 = Color.web("0x9593E6"); 
+	COLOR2 = Color.web("0xB1DCF5");
 	
 
 	
@@ -41,35 +40,36 @@ public class Style{
 		s.setMinWidth(850);
 		s.setMaxWidth(1000);
 		s.setMinHeight(400);
-		//s.sizeToScene();
 
 	}
 
-	public static void setDefaultStyle(Scene s){
-		
+	public static void setDefaultStyle(Node n){
+		//This will just catch all calls that did not need styling 
 	}
 
-	public static void setDefaultStyle(BorderPane bp){
-		/*bp.setBorder(new Border(new BorderStroke(
-			COLOR2,
-			BorderStrokeStyle.SOLID,
-			new CornerRadii(0),
-			BorderStroke.MEDIUM)));
-		*/
+	public static void setDefaultStyle(TableView t){
+		t.setStyle("-fx-font: 13px \"PT Mono\"");
+		t.setBackground(new Background(new BackgroundFill(
+				COLOR2,
+				new CornerRadii(5),
+				new Insets(0,0,0,0))));
+		t.setPrefHeight(900);
+		t.setPrefWidth(200);
+		t.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 	}
 
-
-	public static void setDefaultStyle(Pane p){
-		
+	public static void setDefaultStyle(ListView l){
+		l.setPrefHeight(900);
+		l.setPrefWidth(100);
 	}
+
+	/*
+	************************************************************** 
+	** Top Pane Styling (top menu bar)
+	************************************************************** 
+	*/
 
 	public static void setTopPaneStyle(HBox hb){
-		/*hb.setBorder(new Border(new BorderStroke(
-			COLOR2,
-			BorderStrokeStyle.SOLID,
-			new CornerRadii(0),
-			BorderStroke.MEDIUM)));
-		*/
 		hb.setAlignment(Pos.CENTER_LEFT);
 		hb.setBackground(new Background(
 			new BackgroundFill(
@@ -77,7 +77,6 @@ public class Style{
 				new CornerRadii(0),
 				new Insets(0,0,0,0))));
 		hb.setPadding(new Insets(4));
-
 	}
 
 	public static void setTopPaneStyle(Label l){
@@ -100,7 +99,7 @@ public class Style{
 				BorderStroke.DEFAULT_WIDTHS)));
 		tf.setBackground(new Background(
 			new BackgroundFill(
-				COLOR3,
+				COLOR2,
 				new CornerRadii(5),
 				new Insets(0,0,0,0))));
 		tf.setPrefHeight(35);
@@ -116,7 +115,7 @@ public class Style{
 				new CornerRadii(5),
 				BorderStroke.DEFAULT_WIDTHS)));
 		c.setBackground(new Background(new BackgroundFill(
-				COLOR3,
+				COLOR2,
 				new CornerRadii(5),
 				new Insets(0,0,0,0))));
 		c.setPrefHeight(35);
@@ -139,15 +138,28 @@ public class Style{
 		b.setPrefHeight(35);
 	}
 
+	/*
+	************************************************************** 
+	** Side Pane Styling (List on sidebar)
+	************************************************************** 
+	*/
+
 	public static void setSidePaneStyle(Label l){
 		l.setFont(new Font("PT Mono Bold", 14));
 		l.setTextFill(FONT_COLOR);
 		l.setAlignment(Pos.CENTER);
 	}
 
+
+	/*
+	************************************************************** 
+	** Middle Pane Styling(Info dispays)
+	************************************************************** 
+	*/
+
 	public static void setMidPaneStyle(VBox p){
 		p.setBackground(new Background(new BackgroundFill(
-				COLOR3,
+				COLOR2,
 				new CornerRadii(0),
 				new Insets(0,0,0,0))));
 	}
@@ -157,45 +169,4 @@ public class Style{
 		l.setTextFill(FONT_COLOR);
 		l.setPadding(new Insets(2, 10, 2, 10));
 	}
-
-	public static void setMidPaneStyle(Label l, int id){
-		if(id == 1){
-			l.setFont(new Font("PT Mono Bold", 28));
-			l.setTextFill(FONT_COLOR);
-			l.setPadding(new Insets(2, 10, 2, 10));
-		} else if (id == 2){
-			l.setFont(new Font("PT Mono Bold", 28));
-			l.setTextFill(FONT_COLOR);
-			l.setPadding(new Insets(2, 10, 2, 10));
-		}
-	}
-
-
-	public static void setDefaultStyle(TextField tf){
-		//tf.setMinWidth(50);
-		//tf.setMaxWidth(50);
-	}
-
-	public static void setDefaultStyle(Node n){
-
-	}
-
-
-
-	public static void setDefaultStyle(TableView t){
-		t.setStyle("-fx-font: 13px \"PT Mono\"");
-		t.setBackground(new Background(new BackgroundFill(
-				COLOR3,
-				new CornerRadii(5),
-				new Insets(0,0,0,0))));
-		t.setPrefHeight(900);
-		t.setPrefWidth(200);
-		t.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-	}
-
-	public static void setDefaultStyle(ListView l){
-		l.setPrefHeight(900);
-		l.setPrefWidth(100);
-	}
-
 }

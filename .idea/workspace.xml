@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="04dc1959-4e7b-4b14-b504-20c9f75990f0" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/src/main/java/app/Environment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/app/Environment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/app/ErrorDisplay.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/app/ErrorDisplay.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/app/InfoDisplay.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/app/InfoDisplay.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/app/Networking.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/app/Networking.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/app/Style.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/app/Style.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/app/Environment.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/app/Environment.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/app/ErrorDisplay.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/app/ErrorDisplay.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/app/InfoDisplay$DataPoint.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/app/InfoDisplay$DataPoint.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/app/InfoDisplay.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/app/InfoDisplay.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/app/Networking.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/app/Networking.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/app/Style.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/app/Style.class" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1VzDd70viFNYaRTPFfOo9hx4PEr" />
+  <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="04dc1959-4e7b-4b14-b504-20c9f75990f0" name="Default Changelist" comment="" />
+      <created>1578247113076</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1578247113076</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

@@ -30,20 +30,21 @@ import kong.unirest.HttpResponse;
 import kong.unirest.json.JSONObject;
 
 public class Environment extends Application{
-	//public static final String SERVER_URL = "https://api.exchangeratesapi.io";
-	public static String BASE = "CAD";
+	//Static Data
+	public static String BASE = "USD";
 	public static String START_DATE = "2000-01-01";
 	private static Calendar START_DATE_FORMAT;
 	private static Calendar currentDate;
 	private static boolean dataCorrect = true;
 
+	//Private session data
 	private JSONObject data;
 	private ArrayList<String> currencies = new ArrayList();
-
 	private Calendar selectedDate;
 	private InfoDisplay[] infoDisplays;
 	private InfoDisplay currentDisplay;
 	private BorderPane mainPane;
+
 
 	public void start(Stage mainStage){
 		dataInitHelper();
@@ -56,21 +57,16 @@ public class Environment extends Application{
 			this.mainPane.setTop(genTopPanel());
 		}
 
-		//Style.setDefaultStyle(this.mainPane);
-		System.out.println("CHECK 1");
 		Style.setDefaultStyle(mainPane);
 		Scene s = new Scene(this.mainPane);
-		//Style.setDefaultStyle(s);
 
-
-		
 		Style.setDefaultStyle(mainStage);
 		mainStage.setScene(s);
 		mainStage.show();
 
 	}
 
-	//shoudl check bound and stuff
+	//Helper method that properly initializes data, accounting for errors/problems pulling data
 	private void dataInitHelper(){
 		currentDate = Calendar.getInstance();
 		this.selectedDate = currentDate;
@@ -86,10 +82,9 @@ public class Environment extends Application{
 
 		this.createInfoDisplays();
 		this.currentDisplay = this.infoDisplays[0];
-
-		//System.out.println("DataInit Finished");
 	}
 
+	//Helper method that handled the Top Menu initilization
 	private HBox genTopPanel(){
 		HBox hb = new HBox();
 		Style.setTopPaneStyle(hb);
@@ -122,7 +117,6 @@ public class Environment extends Application{
 		Button goButton = new Button("Apply");
 		Style.setTopPaneStyle(goButton);
 		goButton.setOnAction(event -> {
-			//format text
 
 			String year = yearField.getText(), month = monthField.getText(), day = dayField.getText();
 			String errorMessage = "";
@@ -213,6 +207,8 @@ public class Environment extends Application{
 		return hb;
 	}
 
+
+	//Helper method that generates sideBar
 	private VBox genLeftPanel(){
 		VBox sidePane =  new VBox();
 		Style.setDefaultStyle(sidePane);
@@ -245,10 +241,8 @@ public class Environment extends Application{
 		return sidePane;
 	}
 
-
-
-
-	public ArrayList<String> getKeys(String forKey){
+	//Helper method to get the ArrayList of keys for a particular branch of the data instance variable
+	private ArrayList<String> getKeys(String forKey){
 		if(!this.data.has("error")){
 			ArrayList<String> strs = new ArrayList();
 			Iterator i = data.getJSONObject(forKey).keys();
@@ -260,7 +254,8 @@ public class Environment extends Application{
 		return new ArrayList();
 	}
 
-	public void setData(){
+	//Helper method to initilize data instance variable
+	private void setData(){
 			String[][] dataArgs = {	{"base"},
 								{Environment.BASE}};
 
@@ -268,13 +263,13 @@ public class Environment extends Application{
 
 	}
 
+	//Helper method to initilize the displays for each currency
 	private void createInfoDisplays(){
 		if(this.currencies.size() != 0){
 			this.infoDisplays = new InfoDisplay[this.currencies.size()];
 			for(int i = 0; i < this.infoDisplays.length; i ++){
 				String key = this.currencies.get(i);
 				Double val = this.data.getJSONObject("rates").getDouble(key);
-				//System.out.println("Key : " + key + " | val : " + val);
 				this.infoDisplays[i] = new InfoDisplay(key, val);
 			}
 		} else {
@@ -284,6 +279,10 @@ public class Environment extends Application{
 		}
 	}
 
+	/**
+	 * Get the current (when the session was initilized)
+	 * @return Calendar objec of current date
+	 */
 	public static Calendar getCurrentDate(){
 		return currentDate;
 	}

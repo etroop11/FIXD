@@ -4,13 +4,13 @@ package app;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Button;
 
 public class ErrorDisplay extends InfoDisplay{
 
 	public ErrorDisplay(){
 		super("", 0.0);
 	}
+
 
 	public Pane getDisplay(){
 		VBox vb = new VBox();

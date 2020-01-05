@@ -28,13 +28,20 @@ import kong.unirest.HttpResponse;
 import kong.unirest.json.JSONObject;
 
 public class InfoDisplay{
-	public final String currency;//maybe make private
+	public final String currency;
 	private double valueFromBase;
 	private boolean dataInitilized = false;
 	private JSONObject data;
 	private ObservableList<DataPoint> currentRelativeValues;
 	private ObservableList<DataPoint> pastData;
 
+	/**
+	 * Constructor for An InfoDisplay of a particular currency
+	 * **Note : the data in the display tables will not be initialized until they are requested by the user,
+	 * and cached after they have been
+	 * @param currency The String Key for a currency
+	 * @param valueFromBase Relative value from the Environment base currency
+	 */
 	public InfoDisplay(String currency, Double valueFromBase){
 		this.currency = currency;
 		this.valueFromBase = valueFromBase;
@@ -42,13 +49,20 @@ public class InfoDisplay{
 		this.pastData = FXCollections.observableArrayList();
 	}
 
-	//wrapper class for historical data point
+	/**
+	 * Wrapper class for a datapoint used in the TableViews
+	 */
 	public final class DataPoint{
 		private final SimpleStringProperty key;
 		private final SimpleDoubleProperty value;
 		private final String keyString;
 		private final Double valueDouble;
 
+		/**
+		 * Constructor for a DataPoint
+		 * @param k key for the DataPoint
+		 * @param v value for the DataPoint
+		 */
 		public DataPoint(String k, Double v){
 			this.key = new SimpleStringProperty(k);
 			this.value = new SimpleDoubleProperty(v);
@@ -56,13 +70,22 @@ public class InfoDisplay{
 			this.valueDouble = v;
 		}
 
+		/**
+		 * Getter for Key
+		 * @return value of key
+		 */
 		public String getKey(){
 			return this.key.get();
 		}
 
+		/**
+		 * Getter for Value
+		 * @return value of value
+		 */
 		public Double getValue(){
 			return this.value.get();
 		}
+
 
 		public boolean equals(DataPoint other){
 			if(other != null 
@@ -77,6 +100,10 @@ public class InfoDisplay{
 
 	}
 
+	/**
+	 * Change the relative value from the Environment base currency
+	 * @param newVal new value to change to
+	 */
 	public void changeBaseValue(double newVal){
 		this.valueFromBase = newVal;
 		this.currentRelativeValues = FXCollections.observableArrayList();
@@ -84,12 +111,12 @@ public class InfoDisplay{
 		this.dataInitilized = false;
 	}
 
+	//Helper method to set data
 	private void setData(){
 		this.data = new JSONObject();
 		this.currentRelativeValues = FXCollections.observableArrayList();
 		this.pastData = FXCollections.observableArrayList();
-		//Iniitilize Data with this currency as base
-		//DO ERROR HANDLING
+
 		boolean success = true;
 		String[][] dataArgs = {	{"base"},
 								{this.currency}};
@@ -130,7 +157,6 @@ public class InfoDisplay{
 			
 			for(int i = 0; i < dates.size(); i ++){
 				Double v =  history.getJSONObject("rates").getJSONObject(dates.get(i)).getDouble(currency);
-				//System.out.println(dates.get(i) + " : " +  v);
 				DataPoint dp = new DataPoint(dates.get(i), v);
 				this.pastData.add(dp);
 			}
@@ -145,6 +171,7 @@ public class InfoDisplay{
 			this.dataInitilized = true;
 	}
 
+	//Helper method to generate the main Pane to display data
 	private VBox generateMainBox(){
 		VBox mainTemp = new VBox();
 		Style.setMidPaneStyle(mainTemp);
@@ -229,6 +256,10 @@ public class InfoDisplay{
 
 	}
 
+	/**
+	 * If the data in the tables has not been initialized it will be initialized and the display for that data will be returned
+	 * @return display pane
+	 */
 	public Pane getDisplay(){
 		if (!dataInitilized){
 			setData();

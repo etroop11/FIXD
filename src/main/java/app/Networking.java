@@ -14,7 +14,14 @@ import java.net.URLConnection;
 public class Networking{
 	public static final String SERVER_URL = "https://api.exchangeratesapi.io";
 
-
+	/**
+	 * Base Pull method that generates a server request and returns the data
+	 * @param append String to be appended to main URL
+	 * @param queries the Query titles in order
+	 * @param values the Query values in order
+	 * @return A JSON object with the requested information. If there is no connection, or another error
+	 * :  returns formatted JSON object detailing the error
+	 */
 	public static JSONObject pull(String append, String[] queries, String[] values){
 		if(connected()){
 			if(queries.length != values.length || append == null){
@@ -31,12 +38,10 @@ public class Networking{
 						response.put("error", "Parsing Error (1)");
 						response.put("rates", ratesObj);
 					}
-					System.out.println("finished");
 					return response;
 				} catch (UnirestException ue){
 					JSONObject errorJSON = new JSONObject();
 					errorJSON.put("error", "Error Parsing: " + ue.getMessage());
-					System.out.println("finished");
 					return errorJSON;
 				} catch(Exception e){
 					return null;
@@ -62,13 +67,10 @@ public class Networking{
 						response.put("rates", ratesObj);
 
 					}
-					System.out.println("finished");
 					return response;
 				} catch (UnirestException ue){
 					JSONObject errorJSON = new JSONObject();
-					System.out.println(ue.getMessage());
 					errorJSON.put("error", "Error Parsing (3)");
-					System.out.println("finished");
 					return errorJSON;
 				} catch (Exception e){
 					return null;
@@ -78,29 +80,35 @@ public class Networking{
 			JSONObject response = new JSONObject();
 			JSONObject ratesObj = new JSONObject();
 			ratesObj.put("Data Not Available", 0.0);
-
-			response.put("error", "No COnnection");
+			response.put("error", "No Connection");
 			response.put("rates", ratesObj);
-			System.out.println("ERROR 4");
 			return response;
 		}
 	}
 
+	/**
+	 * Convenience method for Pulling data from the Server
+	 * @param append the string to be appended to the url
+	 * @param pairs Query name and value pairs
+	 * @return A JSON object with the requested information. If there is no connection, or another error
+	 *  :  returns formatted JSON object detailing the error
+	 */
 	public static JSONObject pull(String append, String[][] pairs){
 		if(pairs.length != 2){
+			if(pairs[0].length != pairs[1].length)
+			return null;
+		} else if(pairs[0].length != pairs[1].length) {
 			return null;
 		}
 		return pull(append, pairs[0], pairs[1]);
 	}
 
-	public static boolean connected(){
+	//Check the connection
+	private static boolean connected(){
 		try{
 			URL u = new URL("https://www.google.com");
-			System.out.println("trying to connect");
 			u.openConnection().connect();
-			System.out.println("connected");
 		} catch(Exception e){
-			System.out.println(e);
 			return false;
 		}
 		return true;
